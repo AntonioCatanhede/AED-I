@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// conversao no sentido abcdefg em um displayer BCD
 char conversao_bcd[16][9] = {" _ | ||_|",
                             "     |  |",
                             " _  _||_ ",
