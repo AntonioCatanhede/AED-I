@@ -52,7 +52,7 @@ void printList(LinkedNode *first){
     printf("%d ", tmp->data);
     tmp = tmp->next;
   }
-  printf("\n");
+  printf("\n\n");
 }
 
 // cria a lista ligada
@@ -71,6 +71,37 @@ LinkedNode *makeList (){
   return first;
 }
 
+// divide a lista ao meio, retornando primeiro elemento da segunda metade
+LinkedNode* splitList(LinkedNode *seq1){
+  int i, size = 0;
+  LinkedNode *tmp = seq1;
+  while(seq1 != NULL){
+    seq1 = seq1->next;
+    size++;
+  }
+  seq1 = tmp;
+
+  for(i = 0; i < (size/2) - 1; i++)
+    seq1 = seq1->next;
+  // se tamanho da lista eh impar, segunda metade do tamanho eh impar
+  if(size%2 == 1 && (size/2)%2 == 1)
+    seq1 = seq1->next;
+  // quebra a lista e retorna segunda metade
+  tmp = seq1->next;
+  seq1->next = NULL;
+  return tmp;
+}
+
+// Deleta ultimo elemento, seja a lista circular ou nao
+LinkedNode *deleteLastElement(LinkedNode *seq){
+  LinkedNode *first = seq;
+  while(seq->next != first && seq->next != NULL)
+    seq = seq->next;
+  free(seq);
+  return first;
+}
+
+// Inverte a lista sobre ela mesma (sem criar uma nova)
 LinkedNode *reverseList(LinkedNode *seq){
     LinkedNode  *prev = NULL, *next;
     while(seq->next != NULL){
@@ -79,29 +110,43 @@ LinkedNode *reverseList(LinkedNode *seq){
       prev = seq;
       seq = next;
     }
-    printList(seq);
+    seq->next = prev;
     return seq;
 }
 
 int main(){
-  // primeira sequencia
+  // cria primeira lista ligada
+  printf("Primeira sequencia - ");
   LinkedNode *seq1 = makeList();
   printList(seq1);
-  /* adicionando um elemento apos o primeiro elemento;
+
+  // adicionando um elemento apos o primeiro elemento;
+  printf("Adicionando um elemento a tal sequencia - ");
   LinkedNode *appendedNode = appendNode(seq1, 98);
   printList(seq1);
+
   // segunda sequencia, concatena com a primeira
+  printf("Segunda sequencia - ");
   LinkedNode *seq2 = makeList();
   printList(seq2);
   connectList(seq1, seq2);
-  printf("Lista concatenada! ");
-  printList(seq1);
-  // adiciona um elemento na posicao 4
-  addNode(seq1, 4);
-  printList(seq1);*/
-  // inverte a lista ligada
-  seq1 = reverseList(seq1);
+  printf("Lista concatenada - ");
   printList(seq1);
 
+  // adiciona um elemento na posicao 4
+  printf("Adicionando um elemento na posicao 4 da primeira lista - ");
+  addNode(seq1, 4);
+  printList(seq1);
+
+  // dividindo as listas ao meio
+  printf("Dividindo a lista ao meio - ");
+  LinkedNode *seq3 = splitList(seq1);
+  printList(seq1);
+  printList(seq3);
+
+  // inverte a primeira Lista
+  printf("Invertendo a primeira sequencia - ");
+  seq1 = reverseList(seq1);
+  printList(seq1);
   return 0;
 }
