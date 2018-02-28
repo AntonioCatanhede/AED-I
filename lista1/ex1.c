@@ -1,39 +1,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int *lerSeq(int tamanho){
-	int *sequencia = malloc(tamanho * sizeof(int));
-	if(sequencia != NULL){
-			for(int i = 0; i < tamanho; i++)
-				scanf("%d", sequencia+i);
-	}
-	return sequencia;
+int *createSeq(int size){
+  int *first = malloc(size * sizeof(int)), i;
+  if(first != NULL){
+    printf("Digite sua sequencia:\n");
+    for(i = 0; i < size; i++){
+      scanf("%d", first+i);
+    }
+  }
+  return first;
 }
 
-void imprimirSubseq (int *seq, int tamanho, int k){
-	int i, j;
-	printf("\n\nSubsequencias:\n");
-	for(i = 0; i < tamanho - 1; i++){
-		for(j =  0; j < k-1 && *(seq+i+j) < *(seq+i+j+1); j++){
-				if(j == 0){
-					printf("%d ", *(seq+i));
-				}
-				printf("%d ", *(seq + i + 1));
-		}
-		if(j > 0)
-			printf("\n");
-	}
+int printSubseq (int *seq, int size, int k){
+  int i, j, consec;
+  for(i = 0; i < size; i++){
+    //sempre olha para a variavel de tras
+    consec = 1; // enquanto for consecutivo
+    for(j = 1; consec && j < k && i + j < size; j++){
+      if(*(seq + i + j - 1) == *(seq + i + j) - 1){
+        // verifica atual com anterior
+        if(j == 1)
+          printf("\n%d ", *(seq + i + j -1));
+        printf("%d ", *(seq + i + j));
+      }
+      else consec = 0;
+    }
+    if(*(seq + i + j - 1) != *(seq + i + j) - 1)  // se a prox nao eh consec, pega ultimo elemento
+      i = i + j - 1;
+  }
 }
 
-int main(void){
-	int k, M;	// k maior tamanho das subsequencias, M tamanho na sequencia
 
-	printf("Tamanho M da sequencia a digitar: ");
-	scanf("%d", &M);
-	printf("Maior tamanho k das subsequencias: ");
-	scanf("%d", &k);
+int main(){
+  int k, M;
 
-	int *seq = lerSeq(M);
-	imprimirSubseq(seq, M, k);
-	return 0;
+  printf("Tamanho M da sequencia a digitar: ");
+  scanf("%d", &M);
+  printf("Maior tamanho k das subsequencias: ");
+  scanf("%d", &k);
+
+  int *seq = createSeq(M);
+  printSubseq(seq, M, k);
+  return 0;
 }
