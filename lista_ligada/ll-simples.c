@@ -9,22 +9,28 @@ struct LinkedNode {
   LinkedNode *next;
 };
 
-// adiciona um elemento no final da lista ligada
+// adiciona um elemento a lista
 LinkedNode *appendNode(LinkedNode *first, int num){
-  if(first != NULL)
-    if(first->next != NULL)
-      return NULL;
-
   LinkedNode *tmp = malloc(sizeof(LinkedNode));
   if(tmp == NULL) return NULL;
 
   tmp->data = num;
   tmp->next = NULL;
 
-  if(first != NULL)
+  if(first != NULL){
+    if(first->next != NULL)
+      tmp->next = first->next;
     first->next = tmp;
-
+  }
   return tmp;
+}
+
+// concatena o primeiro argumento ao segundo
+void *connectList (LinkedNode *f1, LinkedNode *f2){
+  LinkedNode *tmp = f1;
+  while(tmp->next != NULL)
+    tmp = tmp->next;
+  tmp->next = f2;
 }
 
 // imprime a lista ligada
@@ -35,6 +41,7 @@ void printList(LinkedNode *first){
     printf("%d ", tmp->data);
     tmp = tmp->next;
   }
+  printf("\n");
 }
 
 // cria a lista ligada
@@ -52,8 +59,24 @@ LinkedNode *makeList (){
   return first;
 }
 
+LinkedNode *reverseList(LinkedNode *first){
+    LinkedNode *tmp = first, *prev, *next;
+
+}
+
 int main(){
-  LinkedNode *seq = makeList();
-  printList(seq);
+  LinkedNode *seq1 = makeList();
+  printList(seq1);  // imprimiu primeira sequencia
+
+  LinkedNode *appendedNode = appendNode(seq1, 98); // coloquei um item no meio
+  printList(seq1);
+
+  LinkedNode *seq2 = makeList();
+  printList(seq2);  // imprimiu segunda sequencia
+  connectList(seq1, seq2);  // concatena a segunda na primeira
+  printf("Lista concatenada! ");
+  printList(seq1);  // imprime lista concatenada
+
+
   return 0;
 }
