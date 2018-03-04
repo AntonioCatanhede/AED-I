@@ -97,18 +97,57 @@ void testSparseMatriz (positionNode *firstPosition){
 }
 
 void insertElement (positionNode *curPosition, int value, int line, int column){
-  int i;
-  elementNode curElement;
-  if(curPosition == NULL) return NULL;
+  elementNode *curElement, *prevElement = NULL;
+  positionNode *prevPosition;
+  if(curPosition == NULL) return;
 
-  for(i = 0; i < line; i++){
-    if(curPosition->nextPosition != NULL)
-      if(i < curPosition->posicao){
-        curPosition = curPosition->nextPosition;
-        i = curPosition->nextPosition;
-      }
+  while(curPosition != NULL ? curPosition->position < line : 0){
+    prevPosition = curPosition;
+    curPosition = curPosition->nextPosition;
   }
-  // terminar ainda...
+
+  if(curPosition == NULL){
+    if(value){
+      prevPosition = addPositionNode(prevPosition, line);
+      curElement = addElementNode(prevPosition->nextElement, value, line, column);
+      prevPosition->nextElement = curElement;
+    }
+  }
+  else{
+    if(curPosition->position == line){
+      if(value){
+        curElement = curPosition->nextElement;
+        while(curElement != NULL ?  curElement->column < column : 0){
+          prevElement = curElement;
+          curElement = curElement->nextElement;
+        }
+
+        if(curElement == NULL){
+          curElement = addElementNode(prevElement, value, line, column);
+        }
+        else{
+          if(curElement->column == column){
+            curElement->value = value;
+          }
+          else{
+            prevElement = addElementNode(prevElement, value, line, column);
+            prevElement->nextElement = curElement;
+            if(curPosition->nextElement == curElement)
+              curPosition->nextElement = prevElement;
+          }
+        }
+      }
+    }
+    else{
+      // line < curPosition->position, entao devemos colocar novo nodo entre o prev e o current
+      if(value){
+        prevPosition = addPositionNode(prevPosition, line);
+        curElement = addElementNode(prevPosition->nextElement, value, line, column);
+        prevPosition->nextElement = curElement;
+        prevPosition->nextPosition = curPosition;
+      }
+    }
+  }
 }
 
 void printSparseMatrix (positionNode *firstPosition, int line, int column){
@@ -122,11 +161,11 @@ void printSparseMatrix (positionNode *firstPosition, int line, int column){
       // isso pode ocorrer somente no caso de curPosition nao nulo
       for(j = 0; j < column; j++){
         if(curElement != NULL ? curElement->column == j : 0){
-          printf("%d ", curElement->value);
+          printf("%3d", curElement->value);
           curElement = curElement->nextElement;
         }
         else{
-          printf("0 ");
+          printf("%3d", 0);
         }
       }
       curPosition = curPosition->nextPosition;
@@ -136,7 +175,7 @@ void printSparseMatrix (positionNode *firstPosition, int line, int column){
     else{
       // curPosition null ou linha com elementos nulos somente
       for(j = 0; j < column; j++)
-        printf("0 ");
+        printf("%3d", 0);
     }
     printf("\n");
   }
@@ -146,6 +185,22 @@ int main(){
   positionNode *matrix = makeSparseMatrix(6, 5);
   //testSparseMatriz(matrix);
   printf("\nImprimindo a matriz esparsa:\n");
+  printSparseMatrix(matrix, 6, 5);
+
+  printf("\nAdicionando um novo numero na matriz:\n");
+  insertElement(matrix, 100, 4, 0);
+  printSparseMatrix(matrix, 6, 5);
+
+  printf("\nAdicionando um novo numero na matriz:\n");
+  insertElement(matrix, 50, 5, 4);
+  printSparseMatrix(matrix, 6, 5);
+
+  printf("\nMudando o ultimo elemento adicionado:\n");
+  insertElement(matrix, 100, 5, 4);
+  printSparseMatrix(matrix, 6, 5);
+
+  printf("\nAdicionando um novo numero na matriz:\n");
+  insertElement(matrix, 100, 2, 2);
   printSparseMatrix(matrix, 6, 5);
   return 0;
 }
