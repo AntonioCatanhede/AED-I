@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MINCAPACITY 15
+#define MINCAPACITY 10
 
 typedef struct arrStack arrStack;
 struct arrStack{
@@ -39,12 +39,17 @@ int isFull(arrStack *stack){
   return stack->top == stack->capacity;
 }
 
-/* Em caso de sucesso, push retorna indice do elemento no topo da pilha
-* no caso contrario, retorna 0
+/* Push retorna indice do elemento no topo da pilha
+* Em uma pilha nao reajustavel: sem sucesso, retorna 0
 */
 int push(arrStack *stack, int elem){
-  if(isFull(stack))
-    return 0;
+  if(isFull(stack)){
+    /* Caso de pilha nao reajustavel: retornaria zero
+     *return 0;
+     */
+     stack->capacity *= 2 ;
+     stack->data = realloc(stack->data, stack->capacity * sizeof(arrStack));
+   }
   stack->data[stack->top] = elem;
   return ++stack->top;
 }
@@ -56,6 +61,10 @@ int push(arrStack *stack, int elem){
 int pop(arrStack *stack, int *elem){
   if(isEmpty(stack))
     return -1;
+  if(stack->top <= stack->capacity / 4){
+    stack->capacity /= 2;
+    stack->data = realloc(stack->data, stack->capacity * sizeof(arrStack));
+  }
   *elem = stack->data[--stack->top];
   return stack->top;
 }
@@ -69,11 +78,13 @@ void deleteStack (arrStack *stack){
 
 int main(){
   arrStack *stack = createArrStack();
-  int i;
+  int i, j;
   // Testando o codigo...
-  printf("Dando push no elemento 1 - %d\n", push(stack, 1));
-  printf("Dando push no elemento 145 - %d\n", push(stack, 145));
-  printf("Dando pop na variavel i - %d\n", pop(stack, &i));
+  for(j = 0; j < 20; j++)
+    printf("Push no elemento: %d / Indice do elemento no topo da lista: %d\n", j, push(stack, j));
+
+  for(j = 20; j > 3; j--)
+    printf("Dando pop. Indice do elemento: %d / Variavel retornada: %d\n", pop(stack, &i), i);
   printf("Imprimindo variavel i - %d\n", i);
   return 0;
 }
