@@ -49,6 +49,10 @@ int push(arrStack *stack, int elem){
      */
      stack->capacity *= 2 ;
      stack->data = realloc(stack->data, stack->capacity * sizeof(arrStack));
+     if(!stack->data){
+       free(stack);
+       return 0;
+     }
    }
   stack->data[stack->top] = elem;
   return ++stack->top;
@@ -64,6 +68,10 @@ int pop(arrStack *stack, int *elem){
   if(stack->top <= stack->capacity / 4){
     stack->capacity /= 2;
     stack->data = realloc(stack->data, stack->capacity * sizeof(arrStack));
+    if(!stack->data){
+      free(stack);
+      return 0;
+    }
   }
   *elem = stack->data[--stack->top];
   return stack->top;
@@ -83,8 +91,10 @@ int main(){
   for(j = 0; j < 20; j++)
     printf("Push no elemento: %d / Indice do elemento no topo da lista: %d\n", j, push(stack, j));
 
-  for(j = 20; j > 3; j--)
-    printf("Dando pop. Indice do elemento: %d / Variavel retornada: %d\n", pop(stack, &i), i);
+  for(j = 20; j > 3; j--){
+    printf("Dando pop. Indice do elemento: %d -", pop(stack, &i));
+    printf("Variavel retornada: %d\n", i);
+  }
   printf("Imprimindo variavel i - %d\n", i);
   return 0;
 }
