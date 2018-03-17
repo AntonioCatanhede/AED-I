@@ -78,7 +78,7 @@ int pop(arrStack *stack, int *elem){
 }
 
 void deleteStack (arrStack *stack){
-  if(!stack){
+  if(stack){
     free(stack->data);
     free(stack);
   }

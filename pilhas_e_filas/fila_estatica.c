@@ -83,6 +83,13 @@ int dequeue (arrQueue *queue, int *elem){
   return 1;
 }
 
+void deleteArrQueue(arrQueue *queue){
+  if(queue){
+    free(queue->data);
+    free(queue);
+  }
+}
+
 int main(){
   arrQueue *queue = createArrQueue();
   int i, j;
