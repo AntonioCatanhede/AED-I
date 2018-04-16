@@ -29,8 +29,7 @@ int balanceFactor(avlTreeNode *n) {
 int isAVL(avlTreeNode *treeRoot){
   if(!treeRoot) return 1;
   if(balanceFactor(treeRoot) < 2)
-    if(isAVL(treeRoot->left) && isAVL(treeRoot->right))
-      return 1;
+    return isAVL(treeRoot->left) && isAVL(treeRoot->right);
   return 0;
 }
 
@@ -188,7 +187,6 @@ void avlRemoveNode (avlTreeNode **treeRoot, int key){
 	avlCheckBalance(treeRoot);
   updateHeight(*treeRoot);
 }
-
 
 void printInOrder(avlTreeNode *root)
 {
