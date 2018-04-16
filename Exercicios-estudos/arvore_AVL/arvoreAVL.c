@@ -107,6 +107,23 @@ void caseRLrotateRightLeft(avlTreeNode **pRoot) {
 	*pRoot = leftgrandChild;
 }
 
+void avlCheckBalance (avlTreeNode **tree){
+  if (balanceFactor(*tree) == 2) { // lado esquerdo mais pesado
+    if (balanceFactor((*tree)->left) == 1 || balanceFactor((*tree)->left) == 0)
+      caseLLrotateRight(tree);  // sem joelho, rotacao simples
+    else
+      caseLRrotateLeftRight(tree); // com joelho, rotacao dupla
+  }
+  else if (balanceFactor(*tree) == -2) { // lado direito mais pesado
+    if (balanceFactor((*tree)->right) == -1 || balanceFactor((*tree)->right) == 0)
+      caseRRrotateLeft(tree); // sem joelho, rotacao simples
+    else
+      caseRLrotateRightLeft(tree); // com joelho, rotacao dupla
+  }
+  else
+    updateHeight(*tree);
+}
+
 void avlInsert(avlTreeNode **treeRoot,	int key) {
 	if (*treeRoot == NULL) {
     // atualiza a raiz para apontar a um novo nodo
@@ -125,38 +142,51 @@ void avlInsert(avlTreeNode **treeRoot,	int key) {
 	if (key == (*treeRoot)-> key)
     return;
 
-	avlTreeNode *tree = *treeRoot;
+  if (key < (*treeRoot)->key)  // move-se recursavimanete para a esquerda
+    avlInsert(&(*treeRoot)->left, key);
+  else //  move-se recursivamente para a direita
+    avlInsert(&(*treeRoot)->right, key);
 
-	if (key < tree->key) { // move-se recursavimanete para a esquerda
-		avlInsert(&tree->left, key);
-
-		if (balanceFactor(tree) == 2) {
-      // verifica se a insercao deixou lado esquerdo mais pesado
-			if (key < tree->left->key)
-				caseLLrotateRight(&tree);
-			else
-        caseLRrotateLeftRight(&tree);
-		}
-		else updateHeight(tree);
-	}
-	else { //  move-se recursivamente para a direita
-		avlInsert(&tree->right, key);
-
-		if (balanceFactor(tree) == -2) {
-      // verifica se a insercao deixou lado direito mais pesado
-			if (key > tree->right->key)
-				caseRRrotateLeft(&tree);
-			else
-        caseRLrotateRightLeft(&tree);
-		}
-		else updateHeight(tree);
-	}
-
-	*treeRoot = tree;
+  avlCheckBalance(treeRoot) ;
 }
 
-void avlRemove(avlTreeNode *treeRoot, int key){
-  // implementar...
+avlTreeNode *minNode(avlTreeNode *t){
+  while(t->left)
+    t = t->left;
+  return t;
+}
+
+void avlRemoveNode (avlTreeNode **treeRoot, int key){
+  avlTreeNode *tmp = NULL;
+  if (!(*treeRoot))
+    return;
+
+  if (key < (*treeRoot)->key)
+    avlRemoveNode(&(*treeRoot)->left, key);
+  else if (key > (*treeRoot)->key)
+    avlRemoveNode(&(*treeRoot)->right, key);
+  else{
+      /* Verificamos primeiros os casos em que ha um unico filho
+      * Apos, se ha os dois filhos, reduzimos ao primeiro casos*/
+      if (!(*treeRoot)->left){ // sem filho a esquerda
+          tmp = *treeRoot;
+          *treeRoot = (*treeRoot)->right;
+          free(tmp);
+      }
+      else if (!(*treeRoot)->right){ // sem filho a direita
+          tmp = *treeRoot;
+          *treeRoot = (*treeRoot)->left;
+          free(tmp);
+      }
+      else{ // caso haja os dois filhos
+        tmp = minNode((*treeRoot)->right);
+        (*treeRoot)->key = tmp->key;
+        avlRemoveNode(&(*treeRoot)->right, tmp->key);
+      }
+      updateHeight(*treeRoot);
+  }
+	avlCheckBalance(treeRoot);
+  updateHeight(*treeRoot);
 }
 
 
@@ -169,6 +199,16 @@ void printInOrder(avlTreeNode *root)
 	}
 }
 
+void printTree(avlTreeNode *root)
+{
+	printf("(");
+	if (root){
+	printf("%d ", root->key);
+	printTree(root->left);
+	printTree(root->right);
+	}
+	printf(")");
+}
 
 int main() {
 	avlTreeNode *root = NULL;
