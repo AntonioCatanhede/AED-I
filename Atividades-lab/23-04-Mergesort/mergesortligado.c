@@ -6,6 +6,7 @@ typedef struct linkedNode linkedNode;
 struct linkedNode{
   int RA;
   int grade;
+  int index;
   linkedNode *next, *last;
 };
 
@@ -22,52 +23,22 @@ void deleteList(linkedNode *tmp){
 }
 
 linkedNode* midNode (linkedNode *first, linkedNode *last){
-  linkedNode *tmp = first;
-  int count = 0, i;
+  int i, mid_index = first->index + (last->index - first->index)/ 2;
 
-  while(tmp ? tmp != last : 0){
-    tmp = tmp->next;
-    count++;  // tamanho da lista ligada
-  }
-
-  for(i = 0; i < count/2 -1; i++)
+  for(i = first->index; i < mid_index; i++)
     first = first->next;
 
-  printf("Test do MidNode: ");
-  if(first) printf("[%d %d]", first->RA, first->grade);
-  else printf("nao");
-  printf(" FIM DO TESTE \n");
   return first;
-}
-
-int antecessor(linkedNode *node1, linkedNode *node2){
-  do{
-    node1 = node1->next;
-  } while(node1 ? node1 != node2 : 0);
-  if(node1 == node2)
-    return 1;
-  return 0;
-}
-
-void mergeSort(linkedNode *low, linkedNode *high){
-
-    if(antecessor(low, high)){
-      printf("%d %d    ===== ", low ? low->RA : -50, high ? high->RA : -50);
-      linkedNode *mid = midNode(low, high);
-      mergeSort(low, mid);
-      mergeSort(mid->next, high);
-
-    //merge(low, mid, high);
-    }
-
 }
 
 void insertNode(linkedNode **linkedList, int RA, int grade){
   linkedNode *tmp = *linkedList, *last = NULL;
+  int index = 0;
 
   while(tmp ? tmp->RA != RA : 0){
     last = tmp;
     tmp = tmp->next;
+    index++;
   }
 
   if(!tmp){
@@ -78,6 +49,7 @@ void insertNode(linkedNode **linkedList, int RA, int grade){
     newNode->RA = RA;
     newNode->grade = grade;
     newNode->next = newNode->last = NULL;
+    newNode->index = index;
 
     if(!last)
       // primeiro nodo (quando a lista esta vazia)
@@ -92,31 +64,56 @@ void insertNode(linkedNode **linkedList, int RA, int grade){
     // caso contrario, atualiza a nota
     tmp->grade = grade;
 }
-/*
-void merge(linkedNode *low, linkedNode *mid, linkedNode *high){
-  linkedNode *tmp = mid, *aux = NULL;
-  while(low != mid->next && tmp != high->next){
-    if(low->RA < tmp->RA){
-      insertNode(&aux, low->RA, low->grade);
-      low = low->next;
+
+void swapLinkedList(linkedNode *node1, linkedNode *node2){
+  while(node2){
+    node1->RA = node2->RA;
+    node1->grade = node2->grade;
+    node2 = node2->next;
+    node1 = node1->next;
+  }
+}
+
+// modo 6 - ordme crescente, modo 9 - ordem decrescente
+void merge(linkedNode *low, linkedNode *mid, linkedNode *high, int mode){
+  /// salvamos o mid para usar como referencia nos lacos
+  linkedNode *tmp1 = low, *tmp2 = mid, *aux = NULL;
+
+  while(tmp1 != mid->next && tmp2 != high->next){
+    if( (mode == 6) ? tmp1->RA < tmp2->RA :  tmp1->RA > tmp2->RA){
+      insertNode(&aux, tmp1->RA, tmp1->grade);
+      tmp1 = tmp1->next;
     }
     else{
-      insertNode(&aux, tmp->RA, tmp->grade);
-      tmp = tmp->next;
+      insertNode(&aux, tmp2->RA, tmp2->grade);
+      tmp2 = tmp2->next;
     }
   }
-  while(low != mid->next){
-    insertNode(&aux, low->RA, low->grade);
-    low = low->next;
+
+  while(tmp1 != mid->next){
+    insertNode(&aux, tmp1->RA, tmp1->grade);
+    tmp1= tmp1->next;
   }
-  while(tmp != high->next){
-    insertNode(&aux, tmp->RA, tmp->grade);
-    tmp = tmp->next;
+  while(tmp2 != high->next){
+    insertNode(&aux, tmp2->RA, tmp2->grade);
+    tmp2 = tmp2->next;
   }
-  //printList(aux);
-  //deleteList(aux);
-  printf("acabou");
-}*/
+
+  swapLinkedList(low, aux);
+  deleteList(aux);
+}
+
+// modo 6 - ordme crescente, modo 9 - ordem decrescente
+void mergeSort(linkedNode *low, linkedNode *high, int mode){
+  int a;
+    if((low && high) ? low->index < high->index : 0){
+      linkedNode *mid = midNode(low, high);
+      mergeSort(low, mid, mode);
+      mergeSort(mid->next, high, mode);
+      merge(low, mid->next, high, mode);
+    }
+    printList(low);
+}
 
 int main(){
   int input = 1, RA, grade, mode;
@@ -131,19 +128,18 @@ int main(){
         break;
 
         case 2:   // Imprime a lista
+          printf("[LISTA]\n");
           printList(linkedList);
         break;
 
-        case 6:   // Busca nodo
-          high = linkedList;
-          while(high->next)
-            high = high->next;
-          mergeSort(linkedList, high);
-
+        case 6:   // Lista em ordem crescente de RA
+          for(high = linkedList; high; high = high->next);
+          mergeSort(linkedList, high, 6);
         break;
 
-        case 9:   // Imprime lista ligada
-
+        case 9:   // Lista em ordem descrescente de RA
+          for(high = linkedList; high; high = high->next);
+          mergeSort(linkedList, high, 9);
         break;
     }
   }
