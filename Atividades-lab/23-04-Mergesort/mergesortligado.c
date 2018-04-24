@@ -1,3 +1,7 @@
+/* Codigo escrito por:
+  Arthur Henrique Fernandes     RA11061816
+  Igor Neres Trindade           RA 11030416
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -76,7 +80,6 @@ void swapLinkedList(linkedNode *node1, linkedNode *node2){
 
 // modo 6 - ordme crescente, modo 9 - ordem decrescente
 void merge(linkedNode *low, linkedNode *mid, linkedNode *high, int mode){
-  /// salvamos o mid para usar como referencia nos lacos
   linkedNode *tmp1 = low, *tmp2 = mid, *aux = NULL;
 
   while(tmp1 != mid->next && tmp2 != high->next){
@@ -112,7 +115,6 @@ void mergeSort(linkedNode *low, linkedNode *high, int mode){
       mergeSort(mid->next, high, mode);
       merge(low, mid->next, high, mode);
     }
-    printList(low);
 }
 
 int main(){
@@ -133,13 +135,23 @@ int main(){
         break;
 
         case 6:   // Lista em ordem crescente de RA
-          for(high = linkedList; high; high = high->next);
+          high = linkedList;
+          while(high? high->next : 0)
+            high = high->next;
+
           mergeSort(linkedList, high, 6);
+          printf("[LISTA]\n");
+          printList(linkedList);
         break;
 
         case 9:   // Lista em ordem descrescente de RA
-          for(high = linkedList; high; high = high->next);
+          high = linkedList;
+          while(high? high->next : 0)
+            high = high->next;
+
           mergeSort(linkedList, high, 9);
+          printf("[LISTA]\n");
+          printList(linkedList);
         break;
     }
   }
